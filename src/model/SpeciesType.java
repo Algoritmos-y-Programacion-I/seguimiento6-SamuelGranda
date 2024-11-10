@@ -1,5 +1,5 @@
 package model;
 
-public enum SpeciesType{
-	LAND_FLORA, AQUATIC_FLORA, BIRD, MAMMAL, AQUATIC_FAUNA
+public enum SpeciesType {
+    FLORA_TERRESTRE, FLORA_ACUATICA, AVE, MAMMAL, FAUNA_ACUATICA
 }

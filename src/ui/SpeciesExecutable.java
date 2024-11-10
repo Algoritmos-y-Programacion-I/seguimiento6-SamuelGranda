@@ -1,133 +1,115 @@
 package ui;
 
 import java.util.Scanner;
-
 import model.SpeciesController;
+import model.SpeciesType;
 
 public class SpeciesExecutable {
 
-	private Scanner reader;
-	private SpeciesController speciesController;
+    private Scanner lector;
+    private SpeciesController speciesController;
 
-	public static void main(String[] args) {
-		SpeciesExecutable exe = new SpeciesExecutable();
-		exe.showMainMenu();
-	}
+    public static void main(String[] args) {
+        SpeciesExecutable exe = new SpeciesExecutable();
+        exe.mostrarMenuPrincipal();
+    }
 
-	public SpeciesExecutable() {
+    public SpeciesExecutable() {
+        lector = new Scanner(System.in);
+        speciesController = new SpeciesController();
+    }
 
-		reader = new Scanner(System.in);
-		speciesController = new SpeciesController();
-	}
+    public void mostrarMenuPrincipal() {
+        System.out.println("Bienvenido al sistema de Especies de Icesi");
 
-	public void showMainMenu() {
+        boolean salir = false;
 
-		System.out.println("Welcome to Icesi Species");
+        while (!salir) {
+            System.out.println("\nSeleccione una opción");
+            System.out.println("1. Registrar una Especie");
+            System.out.println("2. Editar una Especie");
+            System.out.println("3. Eliminar una Especie");
+            System.out.println("0. Salir");
 
-		boolean stopFlag = false;
+            int opcion = lector.nextInt();
 
-		while (!stopFlag) {
+            switch (opcion) {
+                case 1:
+                    registrarEspecie();
+                    break;
+                case 2:
+                    editarEspecie();
+                    break;
+                case 3:
+                    eliminarEspecie();
+                    break;
+                case 0:
+                    System.out.println("Gracias por usar el sistema");
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Debe seleccionar una opción válida");
+                    break;
+            }
+        }
+    }
 
-			System.out.println("\nType an option");
-			System.out.println("1. Register a Species");
-			System.out.println("2. Edit a Species");
-			System.out.println("3. Delete a Species");
-			System.out.println("0. Exit");
+    public void registrarEspecie() {
+        System.out.print("Nombre de la especie: ");
+        String nombre = lector.next();
 
-			int mainOption = reader.nextInt();
+        System.out.print("Nombre científico: ");
+        String nombreCientifico = lector.next();
 
-			switch (mainOption) {
+        System.out.println("Tipo de especie: 1. Flora Terrestre, 2. Flora Acuática, 3. Ave, 4. Mamífero, 5. Fauna Acuática");
+        int tipo = lector.nextInt();
+        SpeciesType tipoEspecie = SpeciesType.values()[tipo - 1];
 
-			case 1:
-				registerSpecies();
-				break;
-			case 2:
-				editSpecies();
-				break;
-			case 3:
-				deleteSpecies();
-				break;
-			case 0:
-				System.out.println("Thanks for using our system");
-				stopFlag = true;
-				break;
-			default:
-				System.out.println("You must type a valid option");
-				break;
+        Boolean tieneFlores = null, tieneFrutas = null, esMigratoria = null;
+        Double alturaMaxima = null, pesoMaximo = null;
 
-			}
+        if (tipoEspecie == SpeciesType.FLORA_TERRESTRE || tipoEspecie == SpeciesType.FLORA_ACUATICA) {
+            System.out.print("¿Tiene flores? (true/false): ");
+            tieneFlores = lector.nextBoolean();
+            System.out.print("¿Tiene frutas? (true/false): ");
+            tieneFrutas = lector.nextBoolean();
+            System.out.print("Altura máxima (en metros): ");
+            alturaMaxima = lector.nextDouble();
+        } else {
+            System.out.print("¿Es migratoria? (true/false): ");
+            esMigratoria = lector.nextBoolean();
+            System.out.print("Peso máximo (en kg): ");
+            pesoMaximo = lector.nextDouble();
+        }
 
-		}
+        if (speciesController.registrarEspecie(nombre, nombreCientifico, tipoEspecie, tieneFlores, tieneFrutas, alturaMaxima, esMigratoria, pesoMaximo)) {
+            System.out.println("Especie registrada exitosamente");
+        } else {
+            System.out.println("Error: no se pudo registrar la especie");
+        }
+    }
 
-	}
+    public void editarEspecie() {
+        System.out.println("Seleccione la especie que desea editar: ");
+        System.out.println(speciesController.mostrarListaEspecies());
+        int indice = lector.nextInt() - 1;
 
-	public void registerSpecies() {
+        if (speciesController.obtenerEspecie(indice) != null) {
+            registrarEspecie();
+        } else {
+            System.out.println("Especie no encontrada.");
+        }
+    }
 
-		System.out.println("Type the new Species' name: ");
-		String name = reader.next();
+    public void eliminarEspecie() {
+        System.out.println("Seleccione la especie que desea eliminar: ");
+        System.out.println(speciesController.mostrarListaEspecies());
+        int indice = lector.nextInt() - 1;
 
-		System.out.println("Type the new Species' scientific name: ");
-		String scientificName = reader.next();
-
-		if (speciesController.registerSpecies(name, scientificName)) {
-
-			System.out.println("Species registered successfully");
-
-		} else {
-
-			System.out.println("Error, Species couldn't be registered");
-		}
-
-	}
-
-	public void editSpecies() {
-
-		System.out.println("Which Species do you want to edit?");
-
-		String query = speciesController.showSpeciesList();
-
-		if (!query.equals("")) {
-			System.out.println(query);
-
-			// ...
-
-		} else {
-			System.out.println("There aren't any species registered yet");
-		}
-
-	}
-
-	public void deleteSpecies() {
-
-		System.out.println("Which Species do you want to delete?");
-
-		String query = speciesController.showSpeciesList();
-
-		if (!query.equals("")) {
-			System.out.println(query);
-
-			// ...
-
-		} else {
-			System.out.println("There aren't any species registered yet");
-		}
-
-	}
-
-	public void showSpecies() {
-
-		System.out.println("Which Species do you want to review?");
-
-		String query = speciesController.showSpeciesList();
-
-		if (!query.equals("")) {
-			System.out.println(query);
-
-			// ...
-
-		} else {
-			System.out.println("There aren't any species registered yet");
-		}
-
-	}
+        if (speciesController.eliminarEspecie(indice)) {
+            System.out.println("Especie eliminada exitosamente");
+        } else {
+            System.out.println("Error al intentar eliminar la especie");
+        }
+    }
 }
